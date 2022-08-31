@@ -28,7 +28,6 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
   
   msref-accountsms:
     image: nschlimm/msref-accountsms:latest
