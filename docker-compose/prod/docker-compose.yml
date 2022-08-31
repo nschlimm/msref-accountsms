@@ -10,6 +10,25 @@ services:
     networks:
      - schlimmbank
       
+  msref-discovery:
+    image: nschlimm/msref-discovery:latest
+    mem_limit: 700m
+    ports:
+      - "8070:8070"
+    networks:
+      - schlimmbank
+    depends_on:
+      - msref-config
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+  
   msref-accountsms:
     image: nschlimm/msref-accountsms:latest
     mem_limit: 700m
@@ -19,6 +38,7 @@ services:
       - schlimmbank
     depends_on:
       - msref-config
+      - msref-discovery
     deploy:
       restart_policy:
         condition: on-failure
@@ -38,6 +58,7 @@ services:
       - schlimmbank
     depends_on:
       - msref-config
+      - msref-discovery
     deploy:
       restart_policy:
         condition: on-failure
@@ -57,6 +78,7 @@ services:
       - schlimmbank
     depends_on:
       - msref-config
+      - msref-discovery
     deploy:
       restart_policy:
         condition: on-failure
