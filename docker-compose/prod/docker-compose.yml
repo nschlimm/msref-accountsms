@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
 
   msref-config:
@@ -22,7 +20,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 15s
         max_attempts: 3
         window: 120s
     environment:
@@ -42,12 +40,34 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 20s
         max_attempts: 3
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      EUREKA_CLIENT_SERVICEURL_devZONE: http://msref-discovery:8070/eureka/
+  
+  msref-accountsms1:
+    image: nschlimm/msref-accountsms:latest
+    mem_limit: 700m
+    ports:
+      - "8080:8081"
+    networks:
+      - schlimmbank
+    depends_on:
+      - msref-config
+      - msref-discovery
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 20s
+        max_attempts: 3
+        window: 120s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
   
   msref-loans:
     image: nschlimm/msref-loans:latest
@@ -62,12 +82,13 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 20s
         max_attempts: 3
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
     
   msref-cards:
     image: nschlimm/msref-cards:latest
@@ -82,12 +103,38 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 5s
+        delay: 20s
         max_attempts: 3
         window: 120s
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
       
+  msref-gateway:
+    image: nschlimm/msref-gateway:latest
+    mem_limit: 700m
+    ports:
+      - "8072:8072"
+    networks:
+      - schlimmbank
+    depends_on:
+      - msref-config
+      - msref-discovery
+      - msref-cards
+      - msref-loans
+      - msref-accountsms
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 45s
+        max_attempts: 3
+        window: 180s
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+  
 networks:
-  schlimmbank:
+  schlimmbank: {}
+  
