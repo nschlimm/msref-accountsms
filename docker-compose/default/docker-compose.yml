@@ -1,12 +1,25 @@
 services:
 
+  msref-zipkin:
+    image: openzipkin/zipkin
+    mem_limit: 700m
+    ports:
+      - "9411:9411"
+    networks:
+     - schlimmbank
+
   msref-config:
     image: nschlimm/msref-config:latest
     mem_limit: 700m
+    depends_on:
+      - msref-zipkin
     ports:
       - "8071:8071"
     networks:
      - schlimmbank
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
       
   msref-discovery:
     image: nschlimm/msref-discovery:latest
@@ -26,6 +39,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
   
   msref-accountsms:
     image: nschlimm/msref-accountsms:latest
@@ -47,6 +61,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
   
   msref-accountsms1:
     image: nschlimm/msref-accountsms:latest
@@ -68,6 +83,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
   
   msref-loans:
     image: nschlimm/msref-loans:latest
@@ -89,6 +105,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
     
   msref-cards:
     image: nschlimm/msref-cards:latest
@@ -110,6 +127,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
       
   msref-gateway:
     image: nschlimm/msref-gateway:latest
@@ -134,6 +152,7 @@ services:
       SPRING_PROFILES_ACTIVE: default
       SPRING_CONFIG_IMPORT: configserver:http://msref-config:8071/
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msref-discovery:8070/eureka/
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
   
 networks:
   schlimmbank: {}

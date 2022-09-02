@@ -3,6 +3,8 @@ package com.nschlimm.accountsms.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,8 @@ import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
 public class AccountsController {
+
+    private static final Logger log = LoggerFactory.getLogger(AccountsController.class);
 
     @Autowired
     private AccountsServiceConfig config;
@@ -62,7 +66,7 @@ public class AccountsController {
 //    @CircuitBreaker(name = "detailsForCustomerSupportApp",fallbackMethod = "myCustomerDetailsFallback")
     @Retry(name = "retryForCustomerDetails",fallbackMethod = "myCustomerDetailsFallback")  
     public CustomerDetails getCustomerDetails(@RequestHeader("schlimmbank-correlation-id") String correlationId,@RequestBody Customer customer) {
-        
+        log.info("getCustomerDetails() method started");
         Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId());
         List<Loans> loans = loansFeignClient.getLoansDetails(correlationId,customer);
         List<Cards> cards = cardsFeignClient.getCardDetails(correlationId,customer);
@@ -71,8 +75,8 @@ public class AccountsController {
         customerDetails.setAccounts(accounts);
         customerDetails.setLoans(loans);
         customerDetails.setCards(cards);
-        return customerDetails;
-        
+        log.info("getCustomerDetails() method ended");
+        return customerDetails;        
     }
     
     @SuppressWarnings("unused")

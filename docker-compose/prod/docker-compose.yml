@@ -1,12 +1,24 @@
 services:
+  msref-zipkin:
+    image: openzipkin/zipkin
+    mem_limit: 700m
+    ports:
+      - "9411:9411"
+    networks:
+     - schlimmbank
 
   msref-config:
     image: nschlimm/msref-config:latest
     mem_limit: 700m
+    depends_on:
+      - msref-zipkin
     ports:
       - "8071:8071"
     networks:
      - schlimmbank
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_ZIPKIN_BASEURL: http://msref-zipkin:9411/
       
   msref-discovery:
     image: nschlimm/msref-discovery:latest
