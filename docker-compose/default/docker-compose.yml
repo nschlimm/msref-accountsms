@@ -1,5 +1,25 @@
 services:
+  grafana:
+    image: "grafana/grafana:latest"
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+    networks:
+     - schlimmbank
+    depends_on:
+      - prometheus  
 
+  prometheus:
+   image: prom/prometheus:latest
+   ports:
+      - "9090:9090"
+   volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+   networks:
+    - schlimmbank
+   
   msref-zipkin:
     image: openzipkin/zipkin
     mem_limit: 700m
@@ -54,7 +74,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 20s
+        delay: 30s
         max_attempts: 3
         window: 120s
     environment:
@@ -76,7 +96,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 20s
+        delay: 30s
         max_attempts: 3
         window: 120s
     environment:
@@ -98,7 +118,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 20s
+        delay: 30s
         max_attempts: 3
         window: 120s
     environment:
@@ -120,7 +140,7 @@ services:
     deploy:
       restart_policy:
         condition: on-failure
-        delay: 20s
+        delay: 30s
         max_attempts: 3
         window: 120s
     environment:

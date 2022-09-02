@@ -28,6 +28,7 @@ import com.nschlimm.accountsms.service.client.LoansFeignClient;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.core.annotation.Timed;
 
 @RestController
 public class AccountsController {
@@ -47,6 +48,7 @@ public class AccountsController {
     private CardsFeignClient cardsFeignClient;
 
     @PostMapping("/myAccount")
+    @Timed(value = "getAccountDetails.time", description = "Time taken to return Account Details")
     public Accounts getAccountDetails(@RequestBody Customer customer) {
         Optional<Accounts> accounts = Optional
                 .ofNullable(accountsRepository.findByCustomerId(customer.getCustomerId()));
